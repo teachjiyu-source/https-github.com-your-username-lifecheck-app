@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Scanner: The Hail Mary Protocol</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- App Container -->
+    <div id="app-container">
+        
+        <!-- Safety Reminder -->
+        <div id="safety-banner">
+            <span class="warning-icon">⚠️</span>
+            <p>Do not touch unknown substances. Observe safely.</p>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <h1 class="glow-text">Life Scanner</h1>
+            <h2 class="sub-title">The Hail Mary Protocol</h2>
+        </header>
+
+        <!-- Home Screen -->
+        <section id="screen-home" class="screen active">
+            <div class="startup-graphic-container">
+                <img src="startup_bg.png" alt="Astrophage Scanner" class="startup-graphic">
+            </div>
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <span>SYSTEM ONLINE</span>
+            </div>
+            <div class="main-actions">
+                <button id="btn-start-scan" class="btn primary-btn glow-btn">
+                    <span class="btn-icon">⚗️</span> START SCAN
+                </button>
+                <button id="btn-view-logs" class="btn secondary-btn glow-btn">
+                    <span class="btn-icon">📋</span> VIEW SAVED OBSERVATIONS
+                </button>
+            </div>
+        </section>
+
+        <!-- Scan Screen -->
+        <section id="screen-scan" class="screen hidden">
+            <div class="screen-header">
+                <h3>NEW SCAN</h3>
+                <button class="btn-back">◀ BACK</button>
+            </div>
+            
+            <form id="scan-form">
+                <!-- Biology Questions -->
+                <fieldset class="question-group bio-group">
+                    <legend>BIOLOGY SCAN</legend>
+                    
+                    <div class="question-item">
+                        <label>1. Does it move on its own?</label>
+                        <div class="toggle-group">
+                            <input type="radio" name="q1" value="1" id="q1-yes" required><label for="q1-yes">YES</label>
+                            <input type="radio" name="q1" value="0" id="q1-no"><label for="q1-no">NO</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item">
+                        <label>2. Does it grow over time?</label>
+                        <div class="toggle-group">
+                            <input type="radio" name="q2" value="1" id="q2-yes" required><label for="q2-yes">YES</label>
+                            <input type="radio" name="q2" value="0" id="q2-no"><label for="q2-no">NO</label>
+                        </div>
+                    </div>
+
+                    <div class="question-item">
+                        <label>3. Does it respond to light, heat, or touch?</label>
+                        <div class="toggle-group">
+                            <input type="radio" name="q3" value="1" id="q3-yes" required><label for="q3-yes">YES</label>
+                            <input type="radio" name="q3" value="0" id="q3-no"><label for="q3-no">NO</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Chemistry Questions -->
+                <fieldset class="question-group chem-group">
+                    <legend>CHEMISTRY SCAN</legend>
+                    
+                    <div class="question-item">
+                        <label>4. Does it change color when tested or over time?</label>
+                        <div class="toggle-group">
+                            <input type="radio" name="q4" value="1" id="q4-yes" required><label for="q4-yes">YES</label>
+                            <input type="radio" name="q4" value="0" id="q4-no"><label for="q4-no">NO</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-item">
+                        <label>5. Does it produce gas or smell?</label>
+                        <div class="toggle-group">
+                            <input type="radio" name="q5" value="1" id="q5-yes" required><label for="q5-yes">YES</label>
+                            <input type="radio" name="q5" value="0" id="q5-no"><label for="q5-no">NO</label>
+                        </div>
+                    </div>
+
+                    <div class="question-item">
+                        <label>6. Does it show any chemical reaction (bubbling, dissolving, etc.)?</label>
+                        <div class="toggle-group">
+                            <input type="radio" name="q6" value="1" id="q6-yes" required><label for="q6-yes">YES</label>
+                            <input type="radio" name="q6" value="0" id="q6-no"><label for="q6-no">NO</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Notes & Photo -->
+                <fieldset class="question-group extra-group">
+                    <legend>ADDITIONAL DATA</legend>
+                    <div class="input-item">
+                        <label for="scan-notes">Subject Notes (Color, Texture, Environment)</label>
+                        <textarea id="scan-notes" rows="3" placeholder="Enter observations..."></textarea>
+                    </div>
+                    <div class="input-item">
+                        <label for="scan-photo">Visual Documentation</label>
+                        <input type="file" id="scan-photo" accept="image/*" capture="environment">
+                        <div id="photo-preview-container" class="hidden">
+                            <img id="photo-preview" src="" alt="Scan photo preview">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <button type="submit" class="btn primary-btn glow-btn w-100">ANALYZE DATA</button>
+            </form>
+        </section>
+
+        <!-- Result Screen -->
+        <section id="screen-result" class="screen hidden">
+            <div class="screen-header">
+                <h3>ANALYSIS COMPLETE</h3>
+                <button class="btn-home">🏠 HOME</button>
+            </div>
+
+            <div class="result-card">
+                <div class="score-display">
+                    <span class="score-label">MATCH PROBABILITY</span>
+                    <div class="score-circle">
+                        <span id="result-score">0</span><span class="score-max">/6</span>
+                    </div>
+                </div>
+                
+                <h2 id="result-classification" class="classification glow-text">...</h2>
+                <p id="result-explanation" class="explanation">...</p>
+                
+                <div class="score-guide">
+                    <h4>CLASSIFICATION METRICS</h4>
+                    <ul>
+                        <li><span class="score-range">0-2</span> <span class="score-desc">Likely Non-Living</span></li>
+                        <li><span class="score-range">3-4</span> <span class="score-desc">Uncertain (Further Test Needed)</span></li>
+                        <li><span class="score-range">5-6</span> <span class="score-desc">Possibly Living Organism</span></li>
+                    </ul>
+                </div>
+                
+                <div class="result-actions">
+                    <button id="btn-save-log" class="btn primary-btn glow-btn w-100">SAVE TO DATABANKS</button>
+                    <button class="btn secondary-btn btn-home w-100 mt-10">DISCARD & RETURN</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Log Screen -->
+        <section id="screen-logs" class="screen hidden">
+            <div class="screen-header">
+                <h3>OBSERVATION DATABANKS</h3>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <button id="btn-clear-logs" class="btn-delete-all">⚠️ PURGE</button>
+                    <button class="btn-home">🏠 HOME</button>
+                </div>
+            </div>
+            
+            <div id="logs-container" class="logs-list">
+                <!-- Logs will be dynamically injected here -->
+                <div class="empty-state">No observations recorded in databanks.</div>
+            </div>
+        </section>
+        
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
