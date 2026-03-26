@@ -47,8 +47,10 @@ Respond in STRICT JSON format matching this schema:
 
         contents.push({ parts });
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
+        console.log(`Payload size: ${JSON.stringify(contents).length} chars`);
+
         const apiRes = await fetch(geminiUrl, {
             method: 'POST',
             headers: {
@@ -65,13 +67,16 @@ Respond in STRICT JSON format matching this schema:
         const data = await apiRes.json();
 
         if (data.error) {
-            console.error("Gemini API Error:", data.error);
+            console.error("Gemini API Error Detail:", JSON.stringify(data.error, null, 2));
             // Check if it's a rate limit / quota error and give a friendly message
             const msg = data.error.message || '';
-            if (data.error.code === 429 || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate')) {
-                return res.status(429).json({ error: 'The AI is receiving too many requests right now. Please wait 1-2 minutes and try again.' });
+            const code = data.error.code;
+            if (code === 429 || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate')) {
+                return res.status(429).json({ 
+                    error: `The AI is receiving too many requests right now (Error 429). Please wait 1-2 minutes. (Internal: ${msg})` 
+                });
             }
-            return res.status(500).json({ error: msg });
+            return res.status(500).json({ error: `AI Interface Error: ${msg} (Code: ${code})` });
         }
 
         const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
