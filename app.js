@@ -48,15 +48,37 @@ document.addEventListener('DOMContentLoaded', () => {
     btns.backs.forEach(btn => btn.addEventListener('click', () => showScreen('home')));
     btns.homes.forEach(btn => btn.addEventListener('click', () => showScreen('home')));
 
-    // --- Image Upload (Convert to DataURL for LocalStorage saving) ---
+    // --- Image Upload (Compress & Convert to DataURL) ---
     photoInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(event) {
-                currentPhotoData = event.target.result;
-                photoPreview.src = currentPhotoData;
-                photoContainer.classList.remove('hidden');
+                // Compress image using Canvas before storing
+                const img = new Image();
+                img.onload = function() {
+                    const MAX_SIZE = 800; // max width or height
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_SIZE) { height = Math.round(height * MAX_SIZE / width); width = MAX_SIZE; }
+                    } else {
+                        if (height > MAX_SIZE) { width = Math.round(width * MAX_SIZE / height); height = MAX_SIZE; }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Compress to JPEG at 70% quality
+                    currentPhotoData = canvas.toDataURL('image/jpeg', 0.7);
+                    photoPreview.src = currentPhotoData;
+                    photoContainer.classList.remove('hidden');
+                };
+                img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
