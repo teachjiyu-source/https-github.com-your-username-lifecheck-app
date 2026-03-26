@@ -1,3 +1,5 @@
+import { analyzeSpecimenLocally } from './localAnalysis.js';
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- State ---
     let currentPhotoData = null;
@@ -129,25 +131,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn("Running on simple python server. Serverless functions (/api) will return 404. Consider using 'vercel dev'.");
             }
 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s timeout
+            let classification, explanation;
 
-            const response = await fetch('/api/analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(reqBody),
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reqBody),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Server Error: ${response.status}`);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `Server Error: ${response.status}`);
+                }
+
+                const aiResult = await response.json();
+                classification = aiResult.classification;
+                explanation = aiResult.explanation;
+            } catch (apiError) {
+                console.warn("AI Core Unavailable, failing back to Internal Sensors:", apiError);
+                // FALLBACK: Use local analysis
+                const localResult = analyzeSpecimenLocally(currentPhotoData, score);
+                classification = localResult.classification;
+                explanation = localResult.explanation;
             }
-
-            const aiResult = await response.json();
-            const classification = aiResult.classification;
-            const explanation = aiResult.explanation;
             
             // Determine styling based on AI classification
             let statusClass = '';
