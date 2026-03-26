@@ -50,14 +50,21 @@ const TAXONOMY_DB = {
             explanation: "Internal structure follows a repeating geometric lattice. No thermal fluctuations or gas exchanges detected. Geological origin confirmed."
         },
         {
-            name: "Synthetic Polymer Debris",
-            traits: ["artificial smoothness", "hydrocarbon smell", "unnatural color"],
-            explanation: "Specimen is composed of complex manufactured polymers. Material degradation suggests it is human-made wreckage or industrial waste."
-        },
-        {
             name: "Silicate Basalt Fragment",
             traits: ["porous texture", "high iron content", "volcanic origin"],
-            explanation: "Primary composition is volcanic silicate. Micro-cavities contain no organic remnants. Specimen is a standard planetary crust fragment."
+            explanation: "Primary composition is volcanic silicate. Specimen is a standard planetary crust fragment."
+        }
+    ],
+    TECHNOLOGICAL: [
+        {
+            name: "Artificial Computation Device",
+            traits: ["synthetic polymers", "electronic circuitry", "laser/optical sensors"],
+            explanation: "Scanning reveals complex micro-circuitry and synthetic polymers. Specimen matches archetypes for an optical input or computation device."
+        },
+        {
+            name: "Mechanical Interface Component",
+            traits: ["high precision parts", "metal/plastic hybrid", "ergonomic design"],
+            explanation: "Analysis indicates a manufactured object designed for physical interaction. Non-organic origin. High probability of being a peripheral tool."
         }
     ]
 };
@@ -70,7 +77,6 @@ const TAXONOMY_DB = {
  */
 export function analyzeSpecimenLocally(photoData, manualScore) {
     // 1. Calculate a "Visual Seed" from the photoData string length and content
-    // This allows different photos of the same "type" to yield consistent but varying results
     const seed = photoData ? photoData.length % 100 : Math.floor(Math.random() * 100);
     
     let classification, library;
@@ -80,12 +86,15 @@ export function analyzeSpecimenLocally(photoData, manualScore) {
         classification = "POSSIBLY LIVING";
         library = TAXONOMY_DB.LIVING;
     } else if (manualScore >= 3) {
-        // High chance of being an extinct/rare archetype if the score is mid-high
         classification = seed > 50 ? "POSSIBLY LIVING" : "UNCERTAIN";
         library = seed > 70 ? TAXONOMY_DB.EXTINCT_RARE : TAXONOMY_DB.LIVING;
-    } else {
+    } else if (manualScore > 0) {
         classification = "LIKELY NON-LIVING";
         library = TAXONOMY_DB.NON_LIVING;
+    } else {
+        // Score is 0: Assume Technological or Geological depending on "complexity"
+        classification = "LIKELY NON-LIVING";
+        library = seed > 40 ? TAXONOMY_DB.TECHNOLOGICAL : TAXONOMY_DB.NON_LIVING;
     }
 
     // 3. Pick an item from the library based on the visual seed

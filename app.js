@@ -133,6 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let classification, explanation;
 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 55000); // 55s timeout
+
             try {
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
