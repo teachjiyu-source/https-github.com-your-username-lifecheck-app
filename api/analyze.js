@@ -47,7 +47,7 @@ Respond in STRICT JSON format matching this schema:
 
         contents.push({ parts });
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
         
         const apiRes = await fetch(geminiUrl, {
             method: 'POST',
@@ -66,7 +66,12 @@ Respond in STRICT JSON format matching this schema:
 
         if (data.error) {
             console.error("Gemini API Error:", data.error);
-            return res.status(500).json({ error: data.error.message });
+            // Check if it's a rate limit / quota error and give a friendly message
+            const msg = data.error.message || '';
+            if (data.error.code === 429 || msg.toLowerCase().includes('quota') || msg.toLowerCase().includes('rate')) {
+                return res.status(429).json({ error: 'The AI is receiving too many requests right now. Please wait 1-2 minutes and try again.' });
+            }
+            return res.status(500).json({ error: msg });
         }
 
         const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
